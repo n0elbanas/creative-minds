@@ -10,6 +10,7 @@ import {
 	updateDoc,
 } from "firebase/firestore"
 import { toast } from "react-toastify"
+import dayjs from 'dayjs'
 
 export default function Post() {
 	const [post, setPost] = useState({ description: "" })
@@ -17,6 +18,7 @@ export default function Post() {
 	const route = useRouter()
 
 	const routeData = route.query
+	let now = dayjs()
 
 	const submitPost = async (e) => {
 		e.preventDefault()
@@ -49,7 +51,7 @@ export default function Post() {
 			const collectionRef = collection(db, "posts")
 			await addDoc(collectionRef, {
 				...post,
-				timestamp: serverTimestamp(),
+				timestamp: now.format(),
 				user: user.uid,
 				avatar: user.photoURL,
 				username: user.displayName,

@@ -3,14 +3,18 @@ import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import { auth, db } from "../utils/firebase"
 import { toast } from "react-toastify"
-import { AiOutlineNodeCollapse } from "react-icons/ai"
 import { arrayUnion, doc, getDoc, onSnapshot, Timestamp, updateDoc } from "firebase/firestore"
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+
+dayjs.extend(relativeTime)
 
 export default function Details() {
 	const router = useRouter()
 	const routeData = router.query
 	const [message, setMessage] = useState("")
 	const [allMessages, setAllMessages] = useState([])
+    let now = dayjs()
 
     // Submit a message
     const submitMessage = async () => {
@@ -31,7 +35,7 @@ export default function Details() {
                 message,
                 avatar: auth.currentUser.photoURL,
                 username: auth.currentUser.displayName,
-                time: Timestamp.now()
+                timestamp: now.format(),
             })
         })
         setMessage('')
@@ -72,12 +76,13 @@ export default function Details() {
                 <div className="py-6">
                     <h2 className="font-bold">Comments</h2>
                     {allMessages?.map((message) => (
-                        <div className="bg-white p-4 my-4 border-2" key={message.time}>
+                        <div className="bg-white p-4 my-4 border-2" key={message.timestamp}>
                             <div  className='flex items-center gap-2 mb-4'>
                                 <img className='w-8 rounded-full' src={message.avatar} alt="" />
-                                <h2>{message.username}</h2>
+                                <h2 className="text-sm">{message.username}</h2>
                             </div>
                             <h2>{message.message}</h2>
+                            <h4 className="text-gray-600 text-xs">{dayjs(message.timestamp).fromNow()}</h4>
                         </div>
                     ))}
                 </div>
